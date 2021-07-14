@@ -1,25 +1,46 @@
 import type { Component } from "solid-js";
-
-import logo from "./logo.svg";
-import styles from "./App.module.css";
+import { createSignal, Match, Switch } from "solid-js";
+import styles from "./styles/App.module.css";
+import { StartScene } from "./components/StartScene";
+import { GameScene } from "./components/GameScene";
+import { ResultScene } from "./components/ResultScene";
+import { Scene } from "./types";
 
 const App: Component = () => {
+  const [getScene, setScene] = createSignal<Scene>("Start");
+  const [getMoveCount, setMoveCount] = createSignal(0);
+
+  const startGame = () => {
+    setScene("Game");
+  };
+  const finishGame = () => {
+    setScene("Result");
+  };
+  const restartGame = () => {
+    setScene("Start");
+  };
+  const recordMoveCount = (count: number) => {
+    setMoveCount(count);
+  };
+
   return (
-    <div class={styles.App}>
-      <header class={styles.header}>
-        <img src={logo} class={styles.logo} alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          class={styles.link}
-          href="https://github.com/ryansolid/solid"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn Solid
-        </a>
-      </header>
+    <div class={styles.wrapper}>
+      <main class={styles.main}>
+        <Switch>
+          <Match when={getScene() === "Start"}>
+            <StartScene startGame={startGame} />
+          </Match>
+          <Match when={getScene() === "Game"}>
+            <GameScene
+              finishGame={finishGame}
+              recordMoveCount={recordMoveCount}
+            />
+          </Match>
+          <Match when={getScene() === "Result"}>
+            <ResultScene restartGame={restartGame} moveCount={getMoveCount()} />
+          </Match>
+        </Switch>
+      </main>
     </div>
   );
 };
